@@ -6,11 +6,11 @@ class WC_Gateway_Cheque extends WC_Payment_Gateway {
      * Constructor for the gateway.
      */
     public function __construct() {
-        $this->id                 = 'cheque_orquidario';
+        $this->id                 = 'consignado_orquidario';
         $this->icon               = apply_filters( 'woocommerce_cheque_icon', '' );
         $this->has_fields         = false;
-        $this->method_title       = _x( 'Cheque', 'Pagamento em Cheque', 'woocommerce' );
-        $this->method_description = __( 'Aceitar pagamentos presenciais em cheque.', 'woocommerce' );
+        $this->method_title       = _x( 'Consignado', 'Venda consignada.', 'woocommerce' );
+        $this->method_description = __( 'Venda consignada.', 'woocommerce' );
 
         // Load the settings.
         $this->init_form_fields();
@@ -38,14 +38,14 @@ class WC_Gateway_Cheque extends WC_Payment_Gateway {
             'enabled'      => array(
                 'title'   => __( 'Enable/Disable', 'woocommerce' ),
                 'type'    => 'checkbox',
-                'label'   => __( 'Habilitar pagamentos em cheque', 'woocommerce' ),
+                'label'   => __( 'Habilitar pagamentos consignados', 'woocommerce' ),
                 'default' => 'no',
             ),
             'title'        => array(
                 'title'       => __( 'Title', 'woocommerce' ),
                 'type'        => 'text',
                 'description' => __( 'This controls the title which the user sees during checkout.', 'woocommerce' ),
-                'default'     => _x( 'Check payments', 'Check payment method', 'woocommerce' ),
+                'default'     => _x( 'Consignado', 'Pagar consignado.', 'woocommerce' ),
                 'desc_tip'    => true,
             ),
             'description'  => array(
