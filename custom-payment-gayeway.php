@@ -3,7 +3,7 @@
  * Plugin Name:       Custom Payment Gateway
  * Plugin URI:        https://github.com/Shirkit/custom-payment-gayeway
  * Description:       A plugin to automatically update GitHub, Bitbucket or GitLab hosted plugins and themes. It also allows for remote installation of plugins or themes into WordPress.
- * Version:           1.0.0
+ * Version:           1.0.1
  * Author:            Shirkit
  * License:           MIT License
  * License URI:       https://raw.githubusercontent.com/Shirkit/custom-payment-gayeway/master/LICENSE
