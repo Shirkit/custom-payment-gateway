@@ -1,6 +1,6 @@
 <?php
 
-class WC_Gateway_Cheque extends WC_Payment_Gateway {
+class WC_Gateway_Orquidario_Cheque extends WC_Payment_Gateway {
 
     /**
      * Constructor for the gateway.
