@@ -1,13 +1,13 @@
 <?php
 /**
  * Plugin Name:       Custom Payment Gateway
- * Plugin URI:        https://github.com/Shirkit/custom-payment-gayeway
- * Description:       A plugin to automatically update GitHub, Bitbucket or GitLab hosted plugins and themes. It also allows for remote installation of plugins or themes into WordPress.
- * Version:           1.0.4
+ * Plugin URI:        https://github.com/Shirkit/custom-payment-gateway
+ * Description:       Adds more payment gateways for POS System.
+ * Version:           1.0.5
  * Author:            Shirkit
  * License:           MIT License
- * License URI:       https://raw.githubusercontent.com/Shirkit/custom-payment-gayeway/master/LICENSE
- * GitHub Plugin URI: https://github.com/Shirkit/custom-payment-gayeway
+ * License URI:       https://raw.githubusercontent.com/Shirkit/custom-payment-gateway/master/LICENSE
+ * GitHub Plugin URI: https://github.com/Shirkit/custom-payment-gateway
  */
 
 add_action( 'plugins_loaded', 'init_your_gateway_class' );
