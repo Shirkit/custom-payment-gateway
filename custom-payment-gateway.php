@@ -20,12 +20,18 @@ function init_your_gateway_class() {
 }
 
 function add_your_gateway_class( $methods ) {
-    $methods[] = 'WC_Gateway_Orquidario_Cheque'; 
-	$methods[] = 'WC_Gateway_Orquidario_Consignado'; 
-	$methods[] = 'WC_Gateway_Orquidario_Transfer'; 
+    $methods[] = 'WC_Gateway_Orquidario_Cheque';
+	$methods[] = 'WC_Gateway_Orquidario_Consignado';
+	$methods[] = 'WC_Gateway_Orquidario_Transfer';
     return $methods;
 }
 add_filter( 'woocommerce_payment_gateways', 'add_your_gateway_class' );
 
-?>
 
+add_filter('wc_pos_enqueue_styles', 'custom_payment_gateway_styles', 10, 1);
+
+function custom_payment_gateway_styles($styles) {
+	$styles['coupon_presets'] = plugin_dir_url( __FILE__ ) . '/assets/register.css';
+	return $styles;
+}
+?>
