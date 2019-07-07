@@ -73,7 +73,7 @@ class WC_Gateway_Orquidario_Transfer extends WC_Payment_Gateway {
             echo wp_kses_post( wpautop( wptexturize( $this->instructions ) ) );
         }
     }
-	
+
 
     /**
      * Check If The Gateway Is Available For Use.
@@ -82,7 +82,7 @@ class WC_Gateway_Orquidario_Transfer extends WC_Payment_Gateway {
      */
     public function is_available() {
 		return true;
-		
+
         $screen = function_exists('get_current_screen') ? get_current_screen() : null;
         if(!$screen || $screen->id !== 'pos_page'){
             return false;
@@ -117,7 +117,7 @@ class WC_Gateway_Orquidario_Transfer extends WC_Payment_Gateway {
 
         if ( $order->get_total() > 0 ) {
             // Mark as on-hold (we're awaiting the cheque).
-            $order->update_status( apply_filters( 'woocommerce_cheque_process_payment_order_status', 'on-hold', $order ), _x( 'Awaiting check payment', 'Check payment method', 'woocommerce' ) );
+            $order->update_status( apply_filters( 'woocommerce_transfer_orquidario_process_payment_order_status', 'on-hold', $order ), _x( 'Awaiting transfer payment', 'Check payment method', 'woocommerce' ) );
         } else {
             $order->payment_complete();
         }
@@ -134,4 +134,3 @@ class WC_Gateway_Orquidario_Transfer extends WC_Payment_Gateway {
 }
 
 ?>
-
