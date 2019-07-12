@@ -20,10 +20,12 @@ class WC_Gateway_Orquidario_Consignado extends WC_Payment_Gateway {
         $this->title        = $this->get_option( 'title' );
         $this->description  = $this->get_option( 'description' );
         $this->instructions = $this->get_option( 'instructions' );
+        $this->fee          = $this->get_option( 'fee' );
 
         // Actions.
         add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
-        add_action( 'woocommerce_thankyou_cheque', array( $this, 'thankyou_page' ) );
+        add_action( 'woocommerce_thankyou_' . $this->id, array( $this, 'thankyou_page' ) );
+        add_action( 'woocommerce_order_refunded', array( $this, 'process_refunds'), 10, 2 );
 
         // Customer Emails.
         add_action( 'woocommerce_email_before_order_table', array( $this, 'email_instructions' ), 10, 3 );
@@ -46,6 +48,13 @@ class WC_Gateway_Orquidario_Consignado extends WC_Payment_Gateway {
                 'type'        => 'text',
                 'description' => __( 'This controls the title which the user sees during checkout.', 'woocommerce' ),
                 'default'     => _x( 'Consignado', 'Pagar consignado.', 'woocommerce' ),
+                'desc_tip'    => true,
+            ),
+            'fee'        => array(
+                'title'       => __( 'Fee', 'woocommerce' ),
+                'type'        => 'text',
+                'description' => __( 'Enter a fixed amount or percentage to apply as a fee.', 'woocommerce' ),
+                'default'     => '20%',
                 'desc_tip'    => true,
             ),
             'description'  => array(
@@ -105,6 +114,33 @@ class WC_Gateway_Orquidario_Consignado extends WC_Payment_Gateway {
         }
     }
 
+    public function process_refunds( $order_id, $refunds_id ) {
+      $order = wc_get_order( $order_id );
+      $fees = $order->get_fees();
+      error_log('refund');
+      error_log($order);
+      error_log(print_r($fees, true));
+      foreach ($fees as $fee) {
+        if (strcasecmp($fee->get_name(), 'consignado') == 0) {
+          if (!empty($this->fee) && !empty(trim($this->fee)) ) {
+
+            $value = 0;
+
+            if (strpos($this->fee, '%') !== false) {
+              $value = (floatval( trim( $this->fee, '%' ) ) / 100) * ($order->get_subtotal() - $order->get_total_discount(false));
+            } else {
+              $value = floatval( $this->fee );
+            }
+
+            $fee->set_amount( $value );
+            $fee->set_total( $value );
+
+            $order->calculate_totals();
+          }
+        }
+      }
+    }
+
     /**
      * Process the payment and return the result.
      *
@@ -116,8 +152,47 @@ class WC_Gateway_Orquidario_Consignado extends WC_Payment_Gateway {
         $order = wc_get_order( $order_id );
 
         if ( $order->get_total() > 0 ) {
-            // Mark as on-hold (we're awaiting the cheque).
-            $order->update_status( apply_filters( 'woocommerce_consignado_orquidario_process_payment_order_status', 'on-hold', $order ), _x( 'Awaiting consignado payment', 'Check payment method', 'woocommerce' ) );
+
+            if (!empty($this->fee) && !empty(trim($this->fee)) ) {
+
+              $value = 0;
+
+              if (strpos($this->fee, '%') !== false) {
+                $value = (floatval( trim( $this->fee, '%' ) ) / 100) * ($order->get_subtotal() - $order->get_total_discount(false));
+              } else {
+                $value = floatval( $this->fee );
+              }
+
+              // Get the customer country code
+              $country_code = $order->get_shipping_country();
+
+              // Set the array for tax calculations
+              $calculate_tax_for = array(
+                'country' => $country_code,
+                'state' => '',
+                'postcode' => '',
+                'city' => ''
+              );
+
+              // Get a new instance of the WC_Order_Item_Fee Object
+              $item_fee = new WC_Order_Item_Fee();
+
+              $item_fee->set_name( "Consignado" ); // Generic fee name
+              $item_fee->set_amount( $value ); // Fee amount
+              $item_fee->set_tax_class( '' ); // default for ''
+              $item_fee->set_tax_status( 'taxable' ); // or 'none'
+              $item_fee->set_total( $value ); // Fee amount
+
+              // Calculating Fee taxes
+              $item_fee->calculate_taxes( $calculate_tax_for );
+
+              // Add Fee item to the order
+              $order->add_item( $item_fee );
+
+              $order->calculate_totals();
+            }
+
+            $order->update_status( 'on-hold', 'Aguardando pagamento consignado.' );
         } else {
             $order->payment_complete();
         }
