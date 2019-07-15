@@ -25,7 +25,6 @@ class WC_Gateway_Orquidario_Consignado extends WC_Payment_Gateway {
         // Actions.
         add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
         add_action( 'woocommerce_thankyou_' . $this->id, array( $this, 'thankyou_page' ) );
-        add_action( 'woocommerce_order_refunded', array( $this, 'process_refunds'), 10, 2 );
 
         // Customer Emails.
         add_action( 'woocommerce_email_before_order_table', array( $this, 'email_instructions' ), 10, 3 );
@@ -112,33 +111,6 @@ class WC_Gateway_Orquidario_Consignado extends WC_Payment_Gateway {
         if ( $this->instructions && ! $sent_to_admin && 'cheque' === $order->get_payment_method() && $order->has_status( 'on-hold' ) ) {
             echo wp_kses_post( wpautop( wptexturize( $this->instructions ) ) . PHP_EOL );
         }
-    }
-
-    public function process_refunds( $order_id, $refunds_id ) {
-      $order = wc_get_order( $order_id );
-      $fees = $order->get_fees();
-      error_log('refund');
-      error_log($order);
-      error_log(print_r($fees, true));
-      foreach ($fees as $fee) {
-        if (strcasecmp($fee->get_name(), 'consignado') == 0) {
-          if (!empty($this->fee) && !empty(trim($this->fee)) ) {
-
-            $value = 0;
-
-            if (strpos($this->fee, '%') !== false) {
-              $value = (floatval( trim( $this->fee, '%' ) ) / 100) * ($order->get_subtotal() - $order->get_total_discount(false));
-            } else {
-              $value = floatval( $this->fee );
-            }
-
-            $fee->set_amount( $value );
-            $fee->set_total( $value );
-
-            $order->calculate_totals();
-          }
-        }
-      }
     }
 
     /**
