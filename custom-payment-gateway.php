@@ -31,7 +31,7 @@ add_filter( 'woocommerce_payment_gateways', 'add_your_gateway_class' );
 add_filter('wc_pos_enqueue_styles', 'custom_payment_gateway_styles', 10, 1);
 
 function custom_payment_gateway_styles($styles) {
-	$styles['coupon_presets'] = plugin_dir_url( __FILE__ ) . '/assets/register.css';
+	$styles['custom_gayeways'] = plugin_dir_url( __FILE__ ) . '/assets/register.css';
 	return $styles;
 }
 
@@ -58,7 +58,7 @@ function process_refunds( $order_id, $refunds_id ) {
 				} else {
 					$value = floatval( $gcfee );
 				}
-				
+
 				$fee->set_amount( $value );
 				$fee->set_total( $value );
 
