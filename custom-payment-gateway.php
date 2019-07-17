@@ -58,14 +58,7 @@ function process_refunds( $order_id, $refunds_id ) {
 				} else {
 					$value = floatval( $gcfee );
 				}
-				error_log('');
-				error_log('refund');
-				error_log( floatval( trim( $gcfee, '%' ) ) / 100 );
-				error_log( $order->get_subtotal() );
-				error_log( $order->get_total_discount(false) );
-				error_log( $refund->get_total() );
-				error_log( $value );
-
+				
 				$fee->set_amount( $value );
 				$fee->set_total( $value );
 
