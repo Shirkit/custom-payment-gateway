@@ -20,10 +20,10 @@ function init_your_gateway_class() {
 }
 
 function add_your_gateway_class( $methods ) {
-    $methods[] = 'WC_Gateway_Orquidario_Cheque';
+	$methods[] = 'WC_Gateway_Orquidario_Cheque';
 	$methods[] = 'WC_Gateway_Orquidario_Consignado';
 	$methods[] = 'WC_Gateway_Orquidario_Transfer';
-    return $methods;
+	return $methods;
 }
 add_filter( 'woocommerce_payment_gateways', 'add_your_gateway_class' );
 
