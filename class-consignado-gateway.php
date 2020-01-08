@@ -17,10 +17,11 @@ class WC_Gateway_Orquidario_Consignado extends WC_Payment_Gateway {
         $this->init_settings();
 
         // Define user set variables.
-        $this->title        = $this->get_option( 'title' );
-        $this->description  = $this->get_option( 'description' );
-        $this->instructions = $this->get_option( 'instructions' );
-        $this->fee          = $this->get_option( 'fee' );
+        $this->title         = $this->get_option( 'title' );
+        $this->description   = $this->get_option( 'description' );
+        $this->instructions  = $this->get_option( 'instructions' );
+        $this->fee           = $this->get_option( 'fee' );
+        $this->apply_on_edit = $this->get_option( 'apply_on_edit' );
 
         // Actions.
         add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
@@ -54,6 +55,13 @@ class WC_Gateway_Orquidario_Consignado extends WC_Payment_Gateway {
                 'type'        => 'text',
                 'description' => __( 'Enter a fixed amount or percentage to apply as a fee.', 'woocommerce' ),
                 'default'     => '20%',
+                'desc_tip'    => true,
+            ),
+            'apply_on_edit'   => array(
+                'title'       => __( 'Apply on Edit', 'woocommerce' ),
+                'type'        => 'checkbox',
+                'description' => __( 'If when an order is saved (such as when editing an order on backend) if it should auto apply/add the Fee back if it was removed.', 'woocommerce' ),
+                'default'     => 'yes',
                 'desc_tip'    => true,
             ),
             'description'  => array(

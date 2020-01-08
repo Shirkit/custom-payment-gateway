@@ -68,4 +68,69 @@ function process_refunds( $order_id, $refunds_id ) {
 	}
 }
 
+add_action( 'woocommerce_order_before_calculate_taxes', 'calculate_taxes', 10, 2 );
+function calculate_taxes($args, $order) {
+	$gt = new WC_Gateway_Orquidario_Consignado();
+	if ($order->get_payment_method() == $gt->id) {
+		foreach (WC()->payment_gateways()->payment_gateways as $gateway) {
+			if ($gateway->id == $gt->id) {
+				if ($gateway->apply_on_edit == 'yes') {
+
+					$found = false;
+					$value = 0;
+
+					if (strpos($gateway->fee, '%') !== false) {
+						$value = (floatval( trim( $gateway->fee, '%' ) ) / 100) * ($order->get_subtotal() - $order->get_total_discount(false) - $order->get_total_refunded());
+					} else {
+						$value = floatval( $gateway->fee );
+					}
+
+					foreach ($order->get_fees() as $fee) {
+						if (strcasecmp($fee->get_name(), 'consignado') == 0 ) {
+							$found = true;
+
+							$fee->set_amount( $value );
+							$fee->set_total( $value );
+
+							break;
+						}
+					}
+					if (!$found) {
+						// TODO: the code is duplicated here from the Class Consignado
+						// This only triggers if it's Consignado and it doesn't have a Fee called Consignado
+
+						// Get the customer country code
+						$country_code = $order->get_shipping_country();
+
+						// Set the array for tax calculations
+						$calculate_tax_for = array(
+							'country' => $country_code,
+							'state' => '',
+							'postcode' => '',
+							'city' => ''
+						);
+
+						// Get a new instance of the WC_Order_Item_Fee Object
+						$item_fee = new WC_Order_Item_Fee();
+
+						$item_fee->set_name( "Consignado" ); // Generic fee name
+						$item_fee->set_amount( $value ); // Fee amount
+						$item_fee->set_tax_class( '' ); // default for ''
+						$item_fee->set_tax_status( 'taxable' ); // or 'none'
+						$item_fee->set_total( $value ); // Fee amount
+
+						// Calculating Fee taxes
+						$item_fee->calculate_taxes( $calculate_tax_for );
+
+						// Add Fee item to the order
+						$order->add_item( $item_fee );
+
+						$order->calculate_totals();
+					}
+				}
+				break;
+			}
+		}
+	}
+}
 ?>
